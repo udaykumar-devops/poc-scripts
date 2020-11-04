@@ -1,0 +1,12 @@
+---
+# Required Variables
+  releasename: dev
+  namespace: dev
+  master_ip: "{{ groups['k8s-master-ip'][0] }}"
+  k8s_domain: xxxxx.com
+  k8s_prefix: auth
+  keyfile: 
+  certfile: 
+  sample_app_name: sampleapp
+  user: username
+  user_password: password 

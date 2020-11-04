@@ -1,0 +1,10 @@
+[kubernetes-master-nodes]
+kubernetes-master
+
+[kubernetes-worker-nodes]
+kubernetes-worker-1
+kubernetes-worker-2
+kubernetes-worker-3
+
+[k8s-master-ip]
+# kubernetes-master-ipaddress

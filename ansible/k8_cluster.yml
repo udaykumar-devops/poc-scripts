@@ -1,0 +1,26 @@
+---
+- name: play-1
+hosts: kubernetes-master-nodes
+become: yes
+roles:
+    - ssp_prerequisites
+    - install_k8s
+    - configure_k8s_master
+tags: play-1
+
+- name: play-2
+  hosts: kubernetes-worker-nodes
+  become: yes
+  roles:
+    - ssp_prerequisites
+    - install_k8s
+    - attach_nodes
+  tags: play-2
+
+  - name: play-3
+  hosts: kubernetes-master-nodes
+  become: yes
+  roles:
+    - helm_install
+    - add_master_ip
+  tags: play-3

@@ -1,0 +1,59 @@
+---
+  - name: set env variables for DOMAIN and PREFIX
+    become: yes
+    template:
+      src:  "etc/profile.d/domain_env.sh"
+      dest: /etc/profile.d/domain_env.sh
+      owner: root
+      group: root
+      mode: 0777
+
+  - name: source variables
+    shell: source /etc/profile.d/domain_env.sh
+    become: yes
+
+  - name: Initialize K8s master
+    command: kubeadm init
+    become: yes
+
+  - name: Creating .kube directory
+    file:
+      path: $HOME/.kube
+      state: directory
+      mode: 0777
+      owner: root
+      group: root
+
+  - name: copy admin.conf to k8s home
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: $HOME/.kube/config
+      mode: 0777
+      owner: root
+      group: root
+      remote_src: yes
+
+  - name: id command
+    shell: chown $(id -u):$(id -g) $HOME/.kube/config
+    become: yes
+
+  - name: Install weave
+    shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+  - name: Copy adm_token to master
+    copy:
+      src: ../files/adm_token.sh
+      dest: /tmp
+      mode: 777
+      owner: root
+      group: root
+
+  - name: Generate token to join nodes to master
+    shell: "sh /tmp/adm_token.sh > /tmp/token.sh"
+    become: yes
+  
+  - name: Specifying a destination path 
+    fetch:
+      src: /tmp/token.sh
+      dest: /tmp/token.sh
+      flat: yes

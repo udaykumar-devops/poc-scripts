@@ -1,0 +1,90 @@
+---
+  - name: Install software requirements
+    ignore_errors: yes
+    become: true
+    yum: pkg={{ item }} state=latest
+    with_items:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+  - name: install containerd.io
+    shell: dnf install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm -y
+    become: yes
+
+  - name: Add Docker repo
+    command: yum-config-manager i. --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    become: yes
+
+  - name: Install docker-ce
+    yum:
+      name: docker-ce-18.06.2.ce
+      state: present
+    become: yes
+
+  - name: create 'docker' directory
+    file:
+      path: /etc/docker
+      state: directory
+
+  - name: copy daemon.json to docker directory
+    template: src=daemon.json dest=/etc/docker mode=0777 owner=root group=root
+
+  - name: create 'docker.service.d' directory
+    file:
+      path: /etc/systemd/system/docker.service.d
+      state: directory
+      recurse: yes
+
+  - name: daemon reload
+    shell: systemctl daemon-reload
+    
+  - name: Start Docker service
+    service:
+      name: docker
+      state: restarted
+      enabled: yes
+    become: yes
+
+  - name: set enforce
+    shell: setenforce 0
+    become: yes
+
+  - name: sed permissive
+    command: sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+    become: yes
+
+  - name: Copy kubernetes.repo
+    template: src=kubernetes.repo dest=/etc/yum.repos.d mode=0777
+
+  - name: Install Kubernetes
+    become: true
+    yum: pkg={{ item }} state=latest
+    with_items:
+      - kubelet
+      - kubeadm
+      - kubectl
+
+  - name: restart kubelet
+    service: name=kubelet state=restarted enabled=yes
+
+  - name: Creating k8s.conf
+    file:
+     path: /etc/sysctl.d/99-k8s.conf
+     state: touch
+
+  - name: Configure K8s.conf
+    blockinfile:
+      path: /etc/sysctl.d/99-k8s.conf
+      block: |
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        net.ipv4.ip_forward = 1
+
+  - name: system req commands
+    shell: |
+      sysctl --system
+      modprobe br_netfilter
+      lsmod | grep br_netfilter
+      swapoff -a
+      

@@ -1,0 +1,17 @@
+---
+  - name: Copy token.sh to nodes
+    copy:
+      src: /tmp/token.sh
+      dest: /tmp
+      mode: 777
+      owner: root
+      group: root
+      
+  - name: Join nodes with master
+    shell: sh /tmp/token.sh
+    become: yes
+
+  - name: sleep for 20 seconds and continue with play
+    wait_for:
+      timeout: 20
+    delegate_to: localhost
