@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: myapp
+spec:
+  serviceName: "myapp"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        role: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: myapp
+          ports:
+            - containerPort: app-port
+          volumeMounts:
+            - name: nfs-vol
+              mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: nfs-vol
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 10Gi
+      selector:
+        matchLabels:
+          type: nfs

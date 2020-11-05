@@ -1,0 +1,33 @@
+1. What is DevOps according to you? give a sample from you past experience?
+Ans: DevOps is process which invovles complete end to end automation of project. 
+In devops with various satges we can maintian our project from planning to till deployment and maintainance.
+The adavntages of Devops more like consistency, reliability, redundenacy, code maintaince, contnerization, orchestration and Infrastructure as code.
+In my past experience i worked on the tools like git, bitbucket ,jenkins, jfrog, maven, ansible, terraform, shell scripting, docker, kuberentes, aws(minimal) and basic python. 
+
+2.When did you start your DevOps career and what have you been doing over the last 1-2 years?
+Ans: I started my devOps career in the year 2015 from till date and i got an oppurtuinty on various tools in devops.
+Coming to last 1-2 years worked 2 projects which have tools like python and angualar based web application and other one project 
+is to create a instances on cloud environment and vmware using terraform and ansible to deploy the set of appilications.
+In current project working oracle cloud environmet to deploy license based web application which maintians the isolated envirnonment for each user data.
+
+3.Draw a server architecture of your current project?
+Ans. Attachement added as .io file
+
+4. Create an infra requirement for a prodcution kubernetes cluster on public cloud/private cloud and what are your asks if more details required?
+
+5. Whats your understaing on overlay networks and which CNI plugin that you used in your past kubernetes cluster?
+Ans: Don't have any experience on this scenario.
+
+6.what are the sequence steps that you perfrom when you recieve a request from developer for DB ReadOnly access and credentials?
+Ans. We can follow the following sequence of steps :
+
+CREATE USER readonlyuser_username  WITH ENCRYPTED PASSWORD 'readonlyuser_password';
+GRANT USAGE ON SCHEMA public to readonlyuser_username;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonlyuser_username;
+GRANT CONNECT ON DATABASE database-name to readonlyuser_username;
+\c database-name
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonlyuser_username;
+GRANT USAGE ON SCHEMA public to readonlyuser_username;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonlyuser_username;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonlyuser_username;
+
