@@ -9,30 +9,10 @@ pipeline {
                 }
           }
       }
-        stage('Download Artifacts') {  
-                steps {
-                   script {
-                       def server = Artifactory.server 'Art1'
-                       def buildInfo = Artifactory.newBuildInfo()
-                       buildInfo.env.capture = true
-                       def downloadSpec = """{
-                         "files": [{
-                             "pattern": "demo-releases/${VERSION}/node_app.zip"
-                         }
-                       }"""
-                       // Download files from jfrog artifactory
-                      server.download(downloadSpec)
-                       rtBuildInfo (maxBuilds: 1, maxDays: 2, doNotDiscardBuilds: ["3"], deleteBuildArtifacts: true)
-                      server.publishBuildInfo buildInfo
-                      }
-            }
-        }
         stage('Building image') {
            steps{
               script {
-                 sh 'mv ${VERSION}/node_app.zip  ${WORKSPACE}/dockerfiles/demo'
-                 sh 'unzip -q  ${WORKSPACE}/dockerfiles/demo/node_app.zip -d ${WORKSPACE}/dockerfiles/demo'
-                 sh 'docker build -t demo_publisher:${VERSION} ${WORKSPACE}/dockerfiles/demo'
+                 sh 'docker build -t demo_app:${VERSION} ${WORKSPACE}/dockerfiles/demo'
         }
       }
     }
@@ -40,8 +20,8 @@ pipeline {
         steps{
            script{
                docker.withRegistry('https://hyd.ocir.io','OCRlogin') {
-               sh 'docker tag demo_publisher:${VERSION} hyd.ocir.io/idgrosnf0lwv/demo-repo/demo_publisher:${VERSION}'
-               sh 'docker push hyd.ocir.io/idgrosnf0lwv/demo-repo/publisher:${VERSION}'
+               sh 'docker tag demo_app:${VERSION} hyd.ocir.io/idgrosnf0lwv/demo-repo/demo_app:${VERSION}'
+               sh 'docker push hyd.ocir.io/idgrosnf0lwv/demo-repo/app:${VERSION}'
                }
            }
         } 
