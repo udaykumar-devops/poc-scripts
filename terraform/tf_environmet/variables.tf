@@ -3,12 +3,12 @@
 
 variable "project_id" {
   type        = string
-  default     = "carbon-relic-294615"
+  default     = ""
 }
 
 variable "name" {
   type        = string
-  default     = "tf-mssql-public"
+  default     = "mssql-public"
 }
 
 variable "region" {
