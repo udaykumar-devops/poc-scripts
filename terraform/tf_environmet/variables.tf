@@ -1,3 +1,6 @@
+# variable "billing_account" {}
+# variable "org_id" {}
+
 variable "project_id" {
   type        = string
   default     = "carbon-relic-294615"
