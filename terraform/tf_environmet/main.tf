@@ -7,6 +7,6 @@ module "mssql" {
   name                 = var.name
   random_instance_name = true
   project_id           = var.project_id
-  user_name            = "simpleuser"
-  user_password        = "foobar"
+  user_name            = "udaykumar"
+  user_password        = "Uday@1234"
 }
