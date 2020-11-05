@@ -1,0 +1,48 @@
+pipeline {
+  agent any
+  stages{
+      stage('Clone Repository'){
+          steps{
+              script{
+                  deleteDir()
+                  checkout scm
+                }
+          }
+      }
+        stage('Download Artifacts') {  
+                steps {
+                   script {
+                       def server = Artifactory.server 'Art1'
+                       def buildInfo = Artifactory.newBuildInfo()
+                       buildInfo.env.capture = true
+                       def downloadSpec = """{
+                         "files": [{
+                             "pattern": "demo-releases/${VERSION}/hello_world.war"
+                         }
+                       }"""
+                      server.download(downloadSpec)
+                       rtBuildInfo (maxBuilds: 1, maxDays: 2, doNotDiscardBuilds: ["3"], deleteBuildArtifacts: true)
+                      server.publishBuildInfo buildInfo
+                      }
+            }
+        }
+        stage('Building image') {
+           steps{
+              script {
+                 sh 'mv ${VERSION}/hello_world.war  ${WORKSPACE}/dockerfiles/demo'
+                 sh 'docker build --network=host -t demo_publisher:${VERSION} ${WORKSPACE}/dockerfiles/demo'
+        }
+      }
+    }
+      stage('Push Image to OCR') {
+        steps{
+           script{
+               docker.withRegistry('https://hyd.ocir.io','OCRlogin') {
+               sh 'docker tag demo_publisher:${VERSION} hyd.ocir.io/idgrosnf0lwv/demo-repo/demo_publisher:${VERSION}'
+               sh 'docker push hyd.ocir.io/idgrosnf0lwv/demo-repo/publisher:${VERSION}'
+               }
+           }
+        } 
+     }
+  }
+}
