@@ -1,0 +1,13 @@
+kubectl create serviceaccount clusterreadonlyuser
+
+kubectl create clusterrole clusterreadonly --verb=get --verb=list --verb=watch --resource='*'
+
+kubectl create clusterrolebinding clusterreadonly --serviceaccount=default:clusterreadonlyuser --clusterrole=clusterreadonly
+
+TOKEN=$(kubectl describe secrets "$(kubectl describe serviceaccount clusterreadonlyuser | grep -i Tokens | awk '{print $2}')" | grep token: | awk '{print $2}')
+
+kubectl config set-credentials clusterreadonlyuser --token=$TOKEN
+
+kubectl config set-context clusterreader --cluster=<cluster name> --user=clusterreadonlyuser
+
+kubectl config use-context clusterreader

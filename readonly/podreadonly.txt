@@ -1,0 +1,13 @@
+kubectl create serviceaccount podreadonlyuser
+
+kubectl create clusterrole readonly --verb=get --verb=list --verb=watch --resource=pods
+
+kubectl create clusterrolebinding readonly --serviceaccount=default:podreadonlyuser --clusterrole=readonly
+
+TOKEN=$(kubectl describe secrets "$(kubectl describe serviceaccount podreadonlyuser | grep -i Tokens | awk '{print $2}')" | grep token: | awk '{print $2}')
+
+kubectl config set-credentials podreadonlyuser --token=$TOKEN
+
+kubectl config set-context podreader --cluster=<cluster name> --user=podreadonlyuser
+
+kubectl config use-context podreader
